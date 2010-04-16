@@ -6,13 +6,13 @@
  * Author: Johannes Wüller
  * Created On: 24.02.2010
  *
- * Extracts parameters from a given string by applying the provided routes.
- * The routes are applied in definition order. The first matching route is used.
+ * Extracts parameters from a given request string by applying the provided routes.
+ * The routes are applied in the defined order. The first matching route is used.
  * If no route matches, the fallback params (defined by setFallback()) are
  * returned. If the request is empty, the default params (defined by setRoot())
  * are returned.
  *
- * Routes are defined by the use of regular expressions. Named groups can (and
+ * Routes are defined by regular expressions. Named groups can (and
  * should) be used (you still get numerical indexes when using named groups)!
  * Named groups are defined like:
  *    (?<name>regexp)
