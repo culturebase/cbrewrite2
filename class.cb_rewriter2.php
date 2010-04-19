@@ -6,14 +6,14 @@
  * Author: Johannes Wüller
  * Created On: 24.02.2010
  *
- * Extracts parameters from a given request string by applying the provided routes.
- * The routes are applied in the defined order. The first matching route is used.
- * If no route matches, the fallback params (defined by setFallback()) are
- * returned. If the request is empty, the default params (defined by setRoot())
- * are returned.
+ * Extracts parameters from a given request string by applying the provided
+ * routes. The routes are applied in the defined order. The first matching route
+ * is used. If no route matches or the request is empty, the fallback params
+ * (defined by setFallback()) are returned.
  *
- * Routes are defined by regular expressions. Named groups can (and
- * should) be used (you still get numerical indexes when using named groups)!
+ * Routes are defined via regular expressions. Named groups can (and should) be
+ * used (you still get numerical indexes when using named groups)!
+ *
  * Named groups are defined like:
  *    (?<name>regexp)
  * Example:
@@ -22,36 +22,26 @@
  *    $rewrittenParams['page']
  *
  * Usage:
- *    // $_GET before rewriting: Array(
- *    //    [q] => de_DE/index
- *    // )
- *
- *    $rewriter = new Rewriter($_GET['q']);
- *    $rewriter->setRoutes(array(
- *       '/(?<language>[a-z]{2}_[A-Z]{2})\/(?<page>[a-z_]+)/'
- *    ));
- *    $_GET = $rewriter->get();
- *    
- *    // $_GET after rewriting: Array(
- *    //    [0] => de_DE/index
- *    //    [language] => de_DE
- *    //    [1] => de_DE
- *    //    [page] => index
- *    //    [2] => index
- *    // )
+ *    $rewriter = new CbRewriter2(array(
+ *       '/(?<language>\w+)\/(?<page>\w+)/'
+ *    ))->setFallback(array(
+ *       'language' => 'en_EN',
+ *       'page'     => 'index'
+ *    ))->mergeGet();
  */
 class CbRewriter2 {
    private $request        = null;
    private $routes         = array();
-   private $root           = array();
    private $fallback       = array();
    private $loggingEnabled = false;
    private $log            = '';
    
    /**
-    * Constructs rewriter with a given request string
+    * Sets routes (array of regular expressions with named subpatterns; see
+    * http://php.net/preg_match example #4 for details) and an optional request
+    * string to be rewritten.
     */
-   public function __construct($request = null) {
+   public function __construct($routes = array(), $request = null) {
       if ($request === null) {
          $docroot = dirname($_SERVER['SCRIPT_NAME']);
          
@@ -69,34 +59,32 @@ class CbRewriter2 {
       
       $this->request = $request;
    }
-   
+
+   /**
+    * Writes the internal log to the php error log if logging is enabled.
+    */
    public function __destruct() {
       if ($this->loggingEnabled) {
          error_log("CbRewriter2:\n".$this->log);
       }
    }
-   
+
+   /**
+    * Enables or disables internal logging.
+    *
+    * @param enabled Wether logging should be enabled.
+    */
    public function setLogging($enabled) {
       $this->loggingEnabled = $enabled;
    }
-   
+
+   /**
+    * Provides logging for internal purposes.
+    *
+    * @param message What to log
+    */
    private function log($message) {
       $this->log .= $message."\n";
-   }
-   
-   /**
-    * Sets routes (array of regular expressions with named subpatterns; see
-    * http://php.net/preg_match example #4 for details)
-    */
-   public function setRoutes($routes = array()) {
-      $this->routes = $routes;
-   }
-   
-   /**
-    * Sets params that apply if the request is empty.
-    */
-   public function setRoot($root) {
-      $this->root = $root;
    }
 
    /**
@@ -115,7 +103,7 @@ class CbRewriter2 {
          $this->log('empty request');
          
          // return default parameters for empty requests
-         return $this->root;
+         return $this->fallback;
       }
       
       // actual rewriting
@@ -137,6 +125,8 @@ class CbRewriter2 {
    
    /**
     * Returns the request the rewriter was initialized with.
+    *
+    * @return Request that is analyzed.
     */
    public function getRequest() {
       return $this->request;
