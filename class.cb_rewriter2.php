@@ -42,6 +42,8 @@ class CbRewriter2 {
     * string to be rewritten.
     */
    public function __construct($routes = array(), $request = null) {
+      $this->routes = $routes;
+      
       if ($request === null) {
          $docroot = dirname($_SERVER['SCRIPT_NAME']);
          
