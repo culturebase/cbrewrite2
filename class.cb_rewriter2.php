@@ -24,7 +24,8 @@
  * Usage:
  *    $rewriter = new CbRewriter2(array(
  *       '/(?<language>\w+)\/(?<page>\w+)/'
- *    ))->setFallback(array(
+ *    ));
+ *    $rewriter->setFallback(array(
  *       'language' => 'en_EN',
  *       'page'     => 'index'
  *    ))->mergeGet();
