@@ -38,9 +38,9 @@ class CbRewriter2 {
    private $log            = '';
    
    /**
-    * Sets routes (array of regular expressions with named subpatterns; see
-    * http://php.net/preg_match example #4 for details) and an optional request
-    * string to be rewritten.
+    * Sets (optional) routes (array of regular expressions with named
+    * subpatterns; see http://php.net/preg_match example #4 for details) and an
+    * optional request string to be rewritten.
     */
    public function __construct($routes = array(), $request = null) {
       $this->routes = $routes;
