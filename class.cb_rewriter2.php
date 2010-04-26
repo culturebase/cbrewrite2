@@ -79,6 +79,8 @@ class CbRewriter2 {
     */
    public function setLogging($enabled) {
       $this->loggingEnabled = $enabled;
+
+      return $this;
    }
 
    /**
@@ -95,6 +97,8 @@ class CbRewriter2 {
     */
    public function setFallback($fallback) {
       $this->fallback = $fallback;
+
+      return $this;
    }
    
    /**
@@ -129,7 +133,7 @@ class CbRewriter2 {
    /**
     * Returns the request the rewriter was initialized with.
     *
-    * @return Request that is analyzed.
+    * @return Request that is analyzed
     */
    public function getRequest() {
       return $this->request;
@@ -140,9 +144,13 @@ class CbRewriter2 {
     * used like in every other request which has no rewriting enabled.
     * Alternatively you could use $rewriter->get() to recieve the resulting
     * parameters without merging.
+    *
+    * @return Self
     */
    public function mergeGet() {
       $_GET = array_merge($_GET, $this->get());
+
+      return $this;
    }
    
    /**
