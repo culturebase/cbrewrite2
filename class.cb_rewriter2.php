@@ -1,6 +1,6 @@
 <?php
 /**
- * CbRewriter 2.0
+ * @brief
  * Use fancy urls like "de_DE/index" instead of "?language=de_DE&page=index"
  *
  * Author: Johannes Wüller
