@@ -22,10 +22,9 @@
  *    $rewrittenParams['page']
  *
  * Usage:
- *    $rewriter = new CbRewriter2(array(
+ *    CbRewriter2::create(array(
  *       '/(?<language>\w+)\/(?<page>\w+)/'
- *    ));
- *    $rewriter->setFallback(array(
+ *    ))->setFallback(array(
  *       'language' => 'en_EN',
  *       'page'     => 'index'
  *    ))->mergeGet();
@@ -41,6 +40,9 @@ class CbRewriter2 {
     * Sets (optional) routes (array of regular expressions with named
     * subpatterns; see http://php.net/preg_match example #4 for details) and an
     * optional request string to be rewritten.
+    *
+    * @param routes (Optional) list of regular expressions
+    * @param request (Optional) string to be analyzed
     */
    public function __construct($routes = array(), $request = null) {
       $this->routes = $routes;
@@ -64,6 +66,22 @@ class CbRewriter2 {
    }
 
    /**
+    * Calls the constructor to allow oneliners to be used. All parameters get
+    * directly passed to the constructor.
+    *
+    * @return CbRewriter2 instance
+    */
+   public static function create(/* constructor arguments go here */) {
+      // PHP needs this function to be not used as an argument to another
+      // function (another PHP WTF).
+      $args = func_get_args();
+
+      // This syntax is a bit weird. You will get nightmares if you are not
+      // prepared to see this. You need to be strong.
+      return call_user_func_array(array($this, 'parent::__construct'), $args);
+   }
+
+   /**
     * Writes the internal log to the php error log if logging is enabled.
     */
    public function __destruct() {
@@ -76,6 +94,7 @@ class CbRewriter2 {
     * Enables or disables internal logging.
     *
     * @param enabled Wether logging should be enabled.
+    * @return Self
     */
    public function setLogging($enabled) {
       $this->loggingEnabled = $enabled;
@@ -87,13 +106,20 @@ class CbRewriter2 {
     * Provides logging for internal purposes.
     *
     * @param message What to log
+    * @return Self
     */
    private function log($message) {
       $this->log .= $message."\n";
+
+      return $this;
    }
 
    /**
     * Sets params that apply if no route matches.
+    *
+    * @param fallback List of params that are returned by get() if none of the
+    *    specified routes match
+    * @return Self
     */
    public function setFallback($fallback) {
       $this->fallback = $fallback;
@@ -103,6 +129,8 @@ class CbRewriter2 {
    
    /**
     * Finds matching route and returns its params.
+    *
+    * @return Regular expression matches of the matching route
     */
    public function get() {
       // no rewriting for empty requests
@@ -154,7 +182,10 @@ class CbRewriter2 {
    }
    
    /**
-    * Returns wether we are in the index.php file.
+    * Determines wether we are in the index.php file. This method is a helper
+    * that can be used to prevent rewriting ajax entry points, etc.
+    *
+    * @return Wether we are in index.php
     */
    public static function isIndex() {
       return basename($_SERVER['SCRIPT_NAME']) == 'index.php';
