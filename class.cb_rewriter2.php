@@ -94,7 +94,8 @@ class CbRewriter2 {
    }
 
    /**
-    * Enables or disables internal logging.
+    * Enables or disables internal logging (this is very useful for debugging
+    * your routes).
     *
     * @param enabled Wether logging should be enabled.
     * @return Self
