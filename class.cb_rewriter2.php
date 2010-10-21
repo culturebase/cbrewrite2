@@ -76,9 +76,12 @@ class CbRewriter2 {
       // function (another PHP WTF).
       $args = func_get_args();
 
-      // This syntax is a bit weird. You will get nightmares if you are not
-      // prepared to see this. You need to be strong.
-      return call_user_func_array(array('CbRewriter2', '__construct'), $args);
+      // This is not properly documented at the time of writing, but i think you
+      // get what happens here.
+      $class = new ReflectionClass(__CLASS__);
+      $instance = $class->newInstanceArgs($args);
+      
+      return $instance;
    }
 
    /**
