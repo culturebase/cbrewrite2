@@ -77,7 +77,7 @@ class CbRewriter2 {
       $args = func_get_args();
 
       // This is not properly documented at the time of writing, but i think you
-      // get what happens here.
+      // get what happens here (ReflectionClass is a built-in PHP class).
       $class = new ReflectionClass(__CLASS__);
       $instance = $class->newInstanceArgs($args);
       
