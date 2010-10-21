@@ -66,8 +66,9 @@ class CbRewriter2 {
    }
 
    /**
-    * Calls the constructor to allow oneliners to be used. All parameters get
-    * directly passed to the constructor.
+    * Calls the constructor to allow oneliners to be used (since PHP does not
+    * allow using new instances immediately). All parameters get directly passed
+    * to the constructor. The arguments can be used exactly the same way.
     *
     * @return CbRewriter2 instance
     */
