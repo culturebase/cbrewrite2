@@ -78,7 +78,7 @@ class CbRewriter2 {
 
       // This syntax is a bit weird. You will get nightmares if you are not
       // prepared to see this. You need to be strong.
-      return call_user_func_array(array($this, 'parent::__construct'), $args);
+      return call_user_func_array(array('CbRewriter2', '__construct'), $args);
    }
 
    /**
