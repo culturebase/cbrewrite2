@@ -152,7 +152,7 @@ class CbRewriter2 {
       foreach ($this->routes as $route) {
          $this->log('test: '.$route);
          if (preg_match($route, $this->request, $matches)) {
-            $this->log('match found');
+            $this->log('match found; result: '.print_r($matches, true));
             
             // abort after the first matching route
             return $matches;
