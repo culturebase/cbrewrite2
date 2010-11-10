@@ -97,9 +97,9 @@ class CbRewriter2 {
 
    /**
     * Enables or disables internal logging (this is very useful for debugging
-    * your routes, obviously).
+    * your routes, obviously). Logging is disabled by default.
     *
-    * @param enabled Wether logging should be enabled.
+    * @param enabled Wether logging should be enabled
     * @return Self
     */
    public function setLogging($enabled) {
