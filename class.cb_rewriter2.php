@@ -91,7 +91,7 @@ class CbRewriter2 {
     */
    public function __destruct() {
       if ($this->loggingEnabled) {
-         error_log("CbRewriter2:\n".$this->log);
+         error_log("CbRewriter2:\n<pre>".$this->log.'</pre>');
       }
    }
 
@@ -115,9 +115,9 @@ class CbRewriter2 {
     * @return Self
     */
    private function log($message) {
-      $this->log .= $message."\n";
-
-      return $this;
+      if ($this->loggingEnabled) {
+         $this->log .= $message."\n";
+      }
    }
 
    /**
