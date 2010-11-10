@@ -194,7 +194,6 @@ class CbRewriter2 {
     * @return Wether we are in index.php
     */
    public static function isIndex() {
-      return basename($_SERVER['SCRIPT_NAME']) == 'index.php';
+      return basename($_SERVER['SCRIPT_NAME']) === 'index.php';
    }
 }
-?>
