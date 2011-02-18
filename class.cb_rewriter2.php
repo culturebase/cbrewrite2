@@ -48,10 +48,10 @@ class CbRewriter2 {
       $this->setRoutes($routes);
       
       if ($request === null) {
-         // use (relative) path of the invoking script as fallback
-         $request = $_SERVER['PHP_SELF'];
+         // use fallback
+         $request = $_SERVER['SCRIPT_URL'];
 
-         // remove (relative) document root
+         // remove relative document root
          $docroot = dirname($_SERVER['SCRIPT_NAME']);
          $request = preg_replace('/^'.preg_quote($docroot, '/').'\//', '', $request);
       }
