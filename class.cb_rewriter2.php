@@ -21,7 +21,7 @@
  * This match would be accessible via:
  *    $rewrittenParams['page']
  *
- * Usage:
+ * Usage (simple example):
  *    CbRewriter2::create(array(
  *       '/(?<language>\w+)\/(?<page>\w+)/'
  *    ))->setFallback(array(
@@ -45,24 +45,13 @@ class CbRewriter2 {
     * @param request (Optional) string to be analyzed
     */
    public function __construct($routes = array(), $request = null) {
-      $this->routes = $routes;
+      $this->setRoutes($routes);
       
       if ($request === null) {
-         $docroot = dirname($_SERVER['SCRIPT_NAME']);
-         
-         // remove docroot
-         $request = preg_replace('/^'.preg_quote($docroot, '/').'\//', '', $_SERVER['REQUEST_URI']);
-         
-         // remove get params
-         $request = preg_replace('/^(.*)(\?|&).*$/', '$1', $request);
+         $request = $_SERVER['PHP_SELF'];
       }
-      
-      // remove leading and trailing spaces and slashes
-      $request = trim($request);
-      $request = preg_replace('/^\/+/', '', $request);
-      $request = preg_replace('/\/+$/', '', $request);
-      
-      $this->request = $request;
+
+      $this->setRequest($request);
    }
 
    /**
@@ -91,7 +80,7 @@ class CbRewriter2 {
     */
    public function __destruct() {
       if ($this->loggingEnabled) {
-         error_log("CbRewriter2:\n<pre>".$this->log.'</pre>');
+         error_log(sprintf("CbRewriter2:\n<pre>%s</pre>", $this->log));
       }
    }
 
@@ -118,6 +107,29 @@ class CbRewriter2 {
       if ($this->loggingEnabled) {
          $this->log .= $message."\n";
       }
+
+      return $this;
+   }
+
+   /**
+    * Sets the routes used to analyze requests.
+    *
+    * @param routes List of regular expressions
+    * @return Self
+    */
+   public function setRoutes($routes) {
+      $this->routes = $routes;
+
+      return $this;
+   }
+
+   /**
+    * Returns the currently used routes.
+    *
+    * @return List of regular expressions
+    */
+   public function getRoutes() {
+      return $this->routes;
    }
 
    /**
@@ -132,36 +144,30 @@ class CbRewriter2 {
 
       return $this;
    }
-   
+
    /**
-    * Finds matching route and returns its params.
+    * Returns the currently used fallback parameters.
     *
-    * @return Regular expression matches of the matching route
+    * @return List of params
     */
-   public function get() {
-      // no rewriting for empty requests
-      if (empty($this->request)) {
-         $this->log('empty request');
-         
-         // return default parameters for empty requests
-         return $this->fallback;
-      }
-      
-      // actual rewriting
-      $this->log('request: '.$this->request);
-      foreach ($this->routes as $route) {
-         $this->log('test: '.$route);
-         if (preg_match($route, $this->request, $matches)) {
-            $this->log('match found; result: '.print_r($matches, true));
-            
-            // abort after the first matching route
-            return $matches;
-         }
-      }
-      
-      // return default parameters for non-matching requests
-      $this->log('no match found');
+   public function getFallback() {
       return $this->fallback;
+   }
+
+   /**
+    * Sets the request string.
+    *
+    * @param request String to be parsed using the routes
+    * @return Self
+    */
+   public function setRequest($request) {
+      // remove leading and trailing spaces and slashes
+      $request = trim($request);
+      $request = trim($request, '/');
+      
+      $this->request = $request;
+
+      return $this;
    }
    
    /**
@@ -171,6 +177,38 @@ class CbRewriter2 {
     */
    public function getRequest() {
       return $this->request;
+   }
+
+   /**
+    * Finds matching route and returns its params (this is the main
+    * functionality of the rewriter).
+    *
+    * @return Regular expression matches of the matching route
+    */
+   public function get() {
+      // no rewriting for empty requests
+      if (empty($this->request)) {
+         $this->log('empty request');
+
+         // return default parameters for empty requests
+         return $this->fallback;
+      }
+
+      // actual rewriting
+      $this->log('request: '.$this->request);
+      foreach ($this->routes as $route) {
+         $this->log('test: '.$route);
+         if (preg_match($route, $this->request, $matches)) {
+            $this->log('match found; result: '.print_r($matches, true));
+
+            // abort after the first matching route
+            return $matches;
+         }
+      }
+
+      // return default parameters for non-matching requests
+      $this->log('no match found');
+      return $this->fallback;
    }
    
    /**
