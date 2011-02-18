@@ -35,36 +35,6 @@ class CbRewriter2 {
    private $fallback       = array();
    private $loggingEnabled = false;
    private $log            = '';
-   
-   /**
-    * Sets (optional) routes (array of regular expressions with named
-    * subpatterns; see http://php.net/preg_match example #4 for details) and an
-    * optional request string to be rewritten.
-    *
-    * @param routes (Optional) list of regular expressions
-    * @param request (Optional) string to be analyzed
-    */
-   public function __construct($routes = array(), $request = null) {
-      $this->setRoutes($routes);
-
-      if (isset($_GET['cb-debug'])) {
-         $this->setLogging(true);
-      }
-      
-      if ($request === null) {
-         // find appropiate default request
-         $request = $_SERVER['REQUEST_URI'];
-
-         // remove relative document root
-         $docroot = dirname($_SERVER['SCRIPT_NAME']);
-         $request = preg_replace('/^'.preg_quote($docroot, '/').'\//', '', $request);
-
-         // remove get params
-         $request = preg_replace('/^([^\?]+).*$/', '$1', $request);
-      }
-
-      $this->setRequest($request);
-   }
 
    /**
     * Calls the constructor to allow oneliners to be used (since PHP does not
@@ -83,8 +53,22 @@ class CbRewriter2 {
       // get what happens here (ReflectionClass is a built-in PHP class).
       $class = new ReflectionClass(__CLASS__);
       $instance = $class->newInstanceArgs($args);
-      
+
       return $instance;
+   }
+   
+   /**
+    * Sets (optional) routes (array of regular expressions with named
+    * subpatterns; see http://php.net/preg_match example #4 for details) and an
+    * optional request string to be rewritten.
+    *
+    * @param routes (Optional) list of regular expressions
+    * @param request (Optional) string to be analyzed
+    */
+   public function __construct($routes = array(), $request = null) {
+      $this->setLogging(isset($_GET['cb-debug']));
+      $this->setRoutes($routes);
+      $this->setRequest($request !== null ? $request : self::getDefaultRequest());
    }
 
    /**
@@ -94,6 +78,24 @@ class CbRewriter2 {
       if ($this->loggingEnabled) {
          error_log(sprintf("CbRewriter2:\n<pre>%s</pre>", $this->log));
       }
+   }
+
+   /**
+    * Builds the currently requested url for use with the rewriter.
+    *
+    * @return request string
+    */
+   public static function getDefaultRequest() {
+      $request = $_SERVER['REQUEST_URI'];
+
+      // remove relative document root
+      $docroot = dirname($_SERVER['SCRIPT_NAME']);
+      $request = preg_replace('/^'.preg_quote($docroot, '/').'\//', '', $request);
+
+      // remove get params
+      $request = preg_replace('/^([^\?&]+).*$/', '$1', $request);
+
+      return $request;
    }
 
    /**
@@ -196,11 +198,14 @@ class CbRewriter2 {
     * Finds matching route and returns its params (this is the main
     * functionality of the rewriter).
     *
-    * @return Regular expression matches of the matching route
+    * @return Regular expression matches of the matching route, fallback
+    *    otherwise (if no route matched or the request was empty)
     */
    public function get() {
+      $request = $this->getRequest();
+
       // no rewriting for empty requests
-      if (empty($this->request)) {
+      if (empty($request)) {
          $this->log('empty request');
 
          // return default parameters for empty requests
@@ -208,11 +213,13 @@ class CbRewriter2 {
       }
 
       // actual rewriting
-      $this->log('request: '.$this->request);
-      foreach ($this->routes as $route) {
-         $this->log('test: '.$route);
-         if (preg_match($route, $this->request, $matches)) {
-            $this->log('match found; result: '.print_r($matches, true));
+      $this->log('request: %s', $request);
+      
+      foreach ($this->getRoutes() as $route) {
+         $this->log('test: %s', $route);
+         
+         if (preg_match($route, $request, $matches)) {
+            $this->log('match found; result: %s', print_r($matches, true));
 
             // abort after the first matching route
             return $matches;
@@ -221,7 +228,7 @@ class CbRewriter2 {
 
       // return default parameters for non-matching requests
       $this->log('no match found');
-      return $this->fallback;
+      return $this->getFallback();
    }
    
    /**
