@@ -46,14 +46,21 @@ class CbRewriter2 {
     */
    public function __construct($routes = array(), $request = null) {
       $this->setRoutes($routes);
+
+      if (isset($_GET['cb-debug'])) {
+         $this->setLogging(true);
+      }
       
       if ($request === null) {
-         // use fallback
-         $request = $_SERVER['SCRIPT_URL'];
+         // find appropiate default request
+         $request = $_SERVER['REQUEST_URI'];
 
          // remove relative document root
          $docroot = dirname($_SERVER['SCRIPT_NAME']);
          $request = preg_replace('/^'.preg_quote($docroot, '/').'\//', '', $request);
+
+         // remove get params
+         $request = preg_replace('/^([^\?]+).*$/', '$1', $request);
       }
 
       $this->setRequest($request);
@@ -103,14 +110,15 @@ class CbRewriter2 {
    }
 
    /**
-    * Provides logging for internal purposes.
+    * Provides logging for internal purposes. Parameters are equal to the ones
+    * that printf recieves.
     *
-    * @param message What to log
     * @return Self
     */
-   private function log($message) {
+   private function log() {
       if ($this->loggingEnabled) {
-         $this->log .= $message."\n";
+         $args = func_get_args();
+         $this->log .= call_user_func_array('sprintf', $args)."\n";
       }
 
       return $this;
