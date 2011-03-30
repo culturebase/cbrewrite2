@@ -237,11 +237,16 @@ class CbRewriter2 {
     * Alternatively you could use $rewriter->get() to recieve the resulting
     * parameters without merging.
     *
+    * @param override whether to override explicitly (with '?param=val') set GET
+    *                 parameters with rewritten ones or not.
     * @return Self
     */
-   public function mergeGet() {
-      $_GET = array_merge($_GET, $this->get());
-
+   public function mergeGet($override = true) {
+      if ($override) {
+         $_GET = array_merge($_GET, $this->get());
+      } else {
+         $_GET = array_merge($this->get(), $_GET);
+      }
       return $this;
    }
    
