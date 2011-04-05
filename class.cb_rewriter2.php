@@ -23,7 +23,7 @@
  *
  * Usage (simple example):
  *    CbRewriter2::create(array(
- *       '/(?<language>\w+)\/(?<page>\w+)/'
+ *       '/^(?<language>\w+)\/(?<page>\w+)$/'
  *    ))->setFallback(array(
  *       'language' => 'en_EN',
  *       'page'     => 'index'
@@ -76,7 +76,7 @@ class CbRewriter2 {
     */
    public function __destruct() {
       if ($this->loggingEnabled) {
-         error_log(sprintf("CbRewriter2:\n<pre>%s</pre>", $this->log));
+         error_log(sprintf("CbRewriter2:\n<pre>%s</pre>", htmlspecialchars($this->log)));
       }
    }
 
@@ -198,12 +198,12 @@ class CbRewriter2 {
     * Finds matching route and returns its params (this is the main
     * functionality of the rewriter).
     *
-    * @param merge_fallback whether to add fallbacks for parameters that weren't
-    *    rewritten, even if a match was found.
+    * @param mergeFallback Whether to add fallbacks for parameters that were not
+    *    rewritten, even if a match was found
     * @return Regular expression matches of the matching route, fallback
     *    otherwise (if no route matched or the request was empty)
     */
-   public function get($merge_fallback = false) {
+   public function get($mergeFallback = false) {
       $request = $this->getRequest();
 
       // no rewriting for empty requests
@@ -221,14 +221,14 @@ class CbRewriter2 {
          $this->log('test: %s', $route);
          
          if (preg_match($route, $request, $matches)) {
-            if ($merge_fallback) {
-               foreach ($this->getFallback() as $param => $val) {
-                  if (!array_key_exists($param, $matches)) $matches[$param] = $val;
-               }
+            // probably merge with fallback to provide default values for
+            // parameters that are available in the fallback, but missing here
+            if ($mergeFallback) {
+               $matches = array_merge($this->getFallback(), $matches);
             }
-            $this->log('match found; result: %s', print_r($matches, true));
 
             // abort after the first matching route
+            $this->log('match found; result: %s', print_r($matches, true));
             return $matches;
          }
       }
@@ -244,18 +244,16 @@ class CbRewriter2 {
     * Alternatively you could use $rewriter->get() to recieve the resulting
     * parameters without merging.
     *
-    * @param override whether to override explicitly (with '?param=val') set GET
-    *                 parameters with rewritten ones or not.
-    * @param merge_fallback whether to add fallbacks for parameters that weren't
-    *                 rewritten, even if a match was found.
+    * @param override Whether to override explicitly specified GET parameters
+    *    (i.e. '?param=val') with rewritten ones or not
+    * @param mergeFallback Whether to add fallbacks for parameters that were not
+    *    rewritten, even if a match was found (see get())
     * @return Self
     */
-   public function mergeGet($override = true, $merge_fallback = false) {
-      if ($override) {
-         $_GET = array_merge($_GET, $this->get($merge_fallback));
-      } else {
-         $_GET = array_merge($this->get($merge_fallback), $_GET);
-      }
+   public function mergeGet($override = true, $mergeFallback = false) {
+      $m = $this->get($mergeFallback);
+      $_GET = $override ? array_merge($_GET, $m) : array_merge($m, $_GET);
+      
       return $this;
    }
    
