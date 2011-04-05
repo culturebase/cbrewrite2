@@ -26,7 +26,7 @@
  *       'page'     => 'index'
  *    ))->mergeGet();
  *
- * @author Johannes Wüller
+ * @author Johannes Wüller <jw@heimat.de>
  * @date 24.02.2010
  */
 class CbRewriter2 {
@@ -211,7 +211,7 @@ class CbRewriter2 {
          $this->log('empty request');
 
          // return default parameters for empty requests
-         return $this->fallback;
+         return $this->getFallback();
       }
 
       // actual rewriting
