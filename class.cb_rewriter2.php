@@ -1,10 +1,7 @@
 <?php
 /**
  * @brief
- * Use fancy urls like "de_DE/index" instead of "?language=de_DE&page=index"
- *
- * Author: Johannes Wüller
- * Created On: 24.02.2010
+ * Use fancy URLs like "de_DE/index" instead of "?language=de_DE&page=index"
  *
  * Extracts parameters from a given request string by applying the provided
  * routes. The routes are applied in the defined order. The first matching route
@@ -28,6 +25,9 @@
  *       'language' => 'en_EN',
  *       'page'     => 'index'
  *    ))->mergeGet();
+ *
+ * @author Johannes Wüller
+ * @date 24.02.2010
  */
 class CbRewriter2 {
    private $request        = null;
