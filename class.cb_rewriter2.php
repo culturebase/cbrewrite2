@@ -88,11 +88,11 @@ class CbRewriter2 {
    public static function getDefaultRequest() {
       $request = $_SERVER['REQUEST_URI'];
 
-      // remove relative document root
-      $docroot = dirname($_SERVER['SCRIPT_NAME']);
+      // Remove relative document root to be able to map the URL correctly.
+      $docroot = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
       $request = preg_replace('/^'.preg_quote($docroot, '/').'\//', '', $request);
 
-      // remove get params
+      // Remove query string.
       $request = preg_replace('/^([^\?&]+).*$/', '$1', $request);
 
       return $request;
