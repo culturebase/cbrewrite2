@@ -221,6 +221,11 @@ class CbRewriter2 {
          $this->log('test: %s', $route);
 
          if (preg_match($route, $request, $matches)) {
+            // Convert all URL encoded values to regular text.
+            foreach ($matches as $key => $value) {
+               $matches[$key] = urldecode($value);
+            }
+
             // probably merge with fallback to provide default values for
             // parameters that are available in the fallback, but missing here
             if ($mergeFallback) {
