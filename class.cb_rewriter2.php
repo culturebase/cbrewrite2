@@ -228,7 +228,7 @@ class CbRewriter2 {
             }
 
             // abort after the first matching route
-            $this->log('match found; result: %s', print_r($matches, true));
+            $this->log('match found; result: %s', html_entity_decode(print_r($matches, true)));
             return $matches;
          }
       }
