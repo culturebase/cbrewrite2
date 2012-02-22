@@ -56,7 +56,7 @@ class CbRewriter2 {
 
       return $instance;
    }
-   
+
    /**
     * Sets (optional) routes (array of regular expressions with named
     * subpatterns; see http://php.net/preg_match example #4 for details) and an
@@ -76,7 +76,7 @@ class CbRewriter2 {
     */
    public function __destruct() {
       if ($this->loggingEnabled) {
-         error_log(sprintf("CbRewriter2:\n<pre>%s</pre>", htmlspecialchars($this->log)));
+         error_log(__CLASS__ . ":\n" . $this->log);
       }
    }
 
@@ -179,12 +179,12 @@ class CbRewriter2 {
       // remove leading and trailing spaces and slashes
       $request = trim($request);
       $request = trim($request, '/');
-      
+
       $this->request = $request;
 
       return $this;
    }
-   
+
    /**
     * Returns the request the rewriter was initialized with.
     *
@@ -216,10 +216,10 @@ class CbRewriter2 {
 
       // actual rewriting
       $this->log('request: %s', $request);
-      
+
       foreach ($this->getRoutes() as $route) {
          $this->log('test: %s', $route);
-         
+
          if (preg_match($route, $request, $matches)) {
             // probably merge with fallback to provide default values for
             // parameters that are available in the fallback, but missing here
@@ -237,7 +237,7 @@ class CbRewriter2 {
       $this->log('no match found');
       return $this->getFallback();
    }
-   
+
    /**
     * Rewrite request and add resulting parameters to $_GET so that it can be
     * used like in every other request which has no rewriting enabled.
@@ -253,10 +253,10 @@ class CbRewriter2 {
    public function mergeGet($override = true, $mergeFallback = false) {
       $m = $this->get($mergeFallback);
       $_GET = $override ? array_merge($_GET, $m) : array_merge($m, $_GET);
-      
+
       return $this;
    }
-   
+
    /**
     * Determines wether we are in the index.php file. This method is a helper
     * that can be used to prevent rewriting ajax entry points, etc.
