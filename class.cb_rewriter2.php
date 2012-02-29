@@ -83,17 +83,13 @@ class CbRewriter2 {
    /**
     * Builds the currently requested url for use with the rewriter.
     *
-    * @param removeQueryString whether the query string should be removed (if
-    *    present)
     * @return request string
     */
-   public static function getDefaultRequest($removeQueryString = true) {
+   public static function getDefaultRequest() {
       $request = $_SERVER['REQUEST_URI'];
 
       // Remove query string.
-      if ($removeQueryString) {
-         $request = preg_replace('/^([^\?&]+).*$/', '$1', $request);
-      }
+      $request = preg_replace('/^([^\?&]+).*$/', '$1', $request);
 
       // Remove relative document root to be able to map the URL correctly.
       $docroot = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
