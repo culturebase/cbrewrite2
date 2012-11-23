@@ -15,33 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with cbrewrite2.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
- * @brief
- * Use fancy URLs like "de_DE/index" instead of "?language=de_DE&page=index"
- *
- * Extracts parameters from a given request string by applying the provided
- * routes. The routes are applied in the defined order. The first matching route
- * is used. If no route matches or the request is empty, the fallback params
- * (defined by setFallback()) are returned.
- *
- * Routes are defined via regular expressions. Named groups can (and should) be
- * used (you still get numerical indexes when using named groups)!
- *
- * Named groups are defined like:
- *    (?<name>regexp)
- * Example:
- *    (?<page>[a-z_]+)
- * This match would be accessible via:
- *    $rewrittenParams['page']
- *
- * Usage (simple example):
- *    CbRewriter2::create(array(
- *       '/^(?<language>\w+)\/(?<page>\w+)$/'
- *    ))->setFallback(array(
- *       'language' => 'en_EN',
- *       'page'     => 'index'
- *    ))->mergeGet();
- *
  * @author Johannes Wüller <jw@heimat.de>
  * @date 24.02.2010
  */
