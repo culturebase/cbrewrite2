@@ -1,8 +1,7 @@
 <?php
 /**
  * This file is part of cbrewrite2.
- * Copyright (C) 2010-2012  Johannes Wüller, Ulf Hermann, Alexander Nolis,
- *                          Lukas Kupczyk, Jahn Bertsch
+ * Copyright © 2010-2012 stiftung kulturserver.de ggmbh <github@culturebase.org>
  *
  * cbrewrite2 is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
