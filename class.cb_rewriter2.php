@@ -1,5 +1,21 @@
 <?php
 /**
+ * This file is part of cbrewrite2.
+ *
+ * cbrewrite2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * cbrewrite2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with cbrewrite2.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
  * @brief
  * Use fancy URLs like "de_DE/index" instead of "?language=de_DE&page=index"
  *
@@ -86,16 +102,13 @@ class CbRewriter2 {
     * @return request string
     */
    public static function getDefaultRequest() {
-      $request = $_SERVER['REQUEST_URI'];
 
-      // Remove query string.
-      $request = preg_replace('/^([^\?&]+).*$/', '$1', $request);
-
-      // Remove relative document root to be able to map the URL correctly.
-      $docroot = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
-      $request = preg_replace('/^'.preg_quote($docroot, '/').'\//', '', $request);
-
-      return $request;
+      // Remove relative document root and query string to be able to map the URL correctly.
+      return preg_replace(
+            // document root
+            '/^'.preg_quote(rtrim(dirname($_SERVER['SCRIPT_NAME']), '/'), '/').'\//', '',
+            // query string
+            preg_replace('/^([^\?&]+).*$/', '$1', $_SERVER['REQUEST_URI']));
    }
 
    /**
@@ -177,11 +190,7 @@ class CbRewriter2 {
     */
    public function setRequest($request) {
       // remove leading and trailing spaces and slashes
-      $request = trim($request);
-      $request = trim($request, '/');
-
-      $this->request = $request;
-
+      $this->request = trim(trim($request), '/');
       return $this;
    }
 
@@ -219,7 +228,7 @@ class CbRewriter2 {
 
       foreach ($this->getRoutes() as $route) {
          $this->log('test: %s', $route);
-
+         $matches = array();
          if (preg_match($route, $request, $matches)) {
             // Convert all URL encoded values to regular text.
             foreach ($matches as $key => $value) {
