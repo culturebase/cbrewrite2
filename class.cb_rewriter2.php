@@ -76,13 +76,17 @@ class CbRewriter2 {
     * @return request string
     */
    public static function getDefaultRequest() {
+      return self::getRelativeUri($_SERVER['REQUEST_URI']);
+   }
 
+   public static function getRelativeUri($full_uri)
+   {
       // Remove relative document root and query string to be able to map the URL correctly.
       return preg_replace(
             // document root
             '/^'.preg_quote(rtrim(dirname($_SERVER['SCRIPT_NAME']), '/'), '/').'\//', '',
             // query string
-            preg_replace('/^([^\?&]+).*$/', '$1', $_SERVER['REQUEST_URI']));
+            preg_replace('/^([^\?&]+).*$/', '$1', $full_uri));
    }
 
    /**
@@ -105,6 +109,8 @@ class CbRewriter2 {
     * @return Self
     */
    private function log() {
+      $args = func_get_args();
+      error_log(call_user_func_array('sprintf', $args));
       if ($this->loggingEnabled) {
          $args = func_get_args();
          $this->log .= call_user_func_array('sprintf', $args)."\n";
