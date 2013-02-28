@@ -109,8 +109,6 @@ class CbRewriter2 {
     * @return Self
     */
    private function log() {
-      $args = func_get_args();
-      error_log(call_user_func_array('sprintf', $args));
       if ($this->loggingEnabled) {
          $args = func_get_args();
          $this->log .= call_user_func_array('sprintf', $args)."\n";
